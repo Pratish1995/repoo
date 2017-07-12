@@ -1,0 +1,183 @@
+basic join
+1:select sum(c.population)
+from city c ,country cy
+where c.countrycode=cy.code and continent like 'ASIA'
+
+2:select  c.name
+from city c,country cy
+where c.countrycode=cy.code and cy.continent like 'Africa'
+
+3:select cy.continent,avg(c.population)
+from city c,country cy
+where c.countrycode=cy.code
+group by continent
+
+4:select 
+   if(G.Grade < 8, concat('NULL'),s.Name),G.Grade,s.Marks 
+   from Students s
+   inner join Grades g on s.Marks >= G.Min_Mark and s.Marks <= G.Max_Mark 
+   group by G.Grade desc,s.Name,s.Marks 
+
+5:select h.hacker_id, h.name
+from submissions s
+inner join challenges c
+on s.challenge_id = c.challenge_id
+inner join difficulty d
+on c.difficulty_level = d.difficulty_level 
+inner join hackers h
+on s.hacker_id = h.hacker_id
+where s.score = d.score and c.difficulty_level = d.difficulty_level
+group by h.hacker_id, h.name
+having count(s.hacker_id) > 1
+order by count(s.hacker_id) desc, s.hacker_id asc
+
+6:select w.id, p.age, w.coins_needed, w.power
+from Wands as w join Wands_Property as p on (w.code = p.code) 
+where p.is_evil = 0 and w.coins_needed = 
+                                        (select min(coins_needed) 
+                                         from Wands as w1 join Wands_Property as p1 on (w1.code = p1.code) 
+                                         where w1.power = w.power and p1.age = p.age) 
+order by w.power desc, p.age desc
+
+7:with c1 as (
+	select hacker_id, count(*) as cc_ch
+	from Challenges as c
+	group by hacker_id
+), c2 as (
+	select max(cc_ch) as max_cc_ch 
+	from c1
+), c3 as (
+	select cc_ch
+	from c1
+	where cc_ch < (select top 1 max_cc_ch from c2)
+	group by cc_ch
+	having count(*) = 1
+	
+	union 
+	select max_cc_ch from c2
+)
+select h.hacker_id, h.name, c1.cc_ch
+from c1 
+join c3 on c1.cc_ch = c3.cc_ch
+join Hackers as h on c1.hacker_id = h.hacker_id 
+order by c1.cc_ch desc, hacker_id
+
+8:select h.hacker_id, name, sum(score) as total_score
+from
+hackers as h inner join
+(select hacker_id,  max(score) as score from submissions group by challenge_id, hacker_id) max_score
+on h.hacker_id=max_score.hacker_id
+group by h.hacker_id, name
+having total_score > 0
+order by total_score desc, h.hacker_id
+;
+
+advanced joins
+
+1:SELECT start_date, MIN(end_date)
+FROM 
+    (SELECT start_date FROM PROJECTS WHERE start_date NOT IN (SELECT end_date FROM PROJECTS)) a,
+    (SELECT end_date FROM PROJECTS WHERE end_date NOT IN (SELECT start_date FROM PROJECTS)) b
+where start_date < end_date
+GROUP BY start_date
+ORDER BY datediff(day, start_date, MIN(end_date)), start_date
+
+2:select s.name
+from students s, friends f, packages sp, packages fp
+where s.id = f.id
+and s.id = sp.id
+and f.friend_id = fp.id
+and sp.salary < fp.salary
+order by fp.salary;
+
+3:select f.x,f.y
+from functions f join functions s on f.x=s.y and f.y=s.x and f.x<s.x 
+union 
+select x,y from functions f where x=y and ((select count(*) from functions where x=f.x and y=f.y)>1)
+order by x
+
+4:WITH SUM_View_Stats AS (
+SELECT challenge_id
+    , total_views = sum(total_views)
+    , total_unique_views = sum(total_unique_views)
+FROM View_Stats 
+GROUP BY challenge_id
+)
+,SUM_Submission_Stats AS (
+SELECT challenge_id
+    , total_submissions = sum(total_submissions)
+    , total_accepted_submissions = sum(total_accepted_submissions)
+FROM Submission_Stats 
+GROUP BY challenge_id
+)
+
+SELECT    con.contest_id
+        , con.hacker_id
+        , con.name
+        , SUM(total_submissions)
+        , sum(total_accepted_submissions)
+        , sum(total_views)
+        , sum(total_unique_views)
+FROM Contests con
+INNER JOIN Colleges col
+    ON con.contest_id = col.contest_id
+INNER JOIN Challenges cha
+    ON cha.college_id = col.college_id
+LEFT JOIN SUM_View_Stats vs
+    ON vs.challenge_id = cha.challenge_id
+LEFT JOIN SUM_Submission_Stats ss
+    ON ss.challenge_id = cha.challenge_id
+GROUP BY con.contest_id,con.hacker_id,con.name
+HAVING (SUM(total_submissions)
+        +sum(total_accepted_submissions)
+        +sum(total_views)
+        +sum(total_unique_views)) <> 0
+ORDER BY con.contest_ID
+
+5:
+
+
+alternative
+1:declare x number:=20;
+y number:=20;
+
+while x>0
+begin
+print replicate('* ',y)
+set y:=y-1;
+set x:=x-1;
+end;
+
+2:declare @x int,@y int
+select @x=20,@y=1
+while @x>0
+begin
+print replicate('* ',@y);
+set @x=@x-1
+set @y=@y+1
+end
+
+3:DECLARE @i Int = 2, @j Int =2, @f Int =0;
+declare @s varchar(max)
+WHILE(@i<=1000)
+BEGIN
+    set @f=0;  
+   set @j=2;
+    WHILE(@j<=sqrt(@i))
+    BEGIN
+       if (@i%@j=0)
+       BEGIN
+                SET @f=1;
+               break;
+        END
+        set @j=@j+1;
+    END
+   if(@f=0)
+   set @s=concat(@s,@i,'&')
+   set @i=@i+1;
+END
+print left(@s,len(@s)-1)
+
+2:
+
+3:

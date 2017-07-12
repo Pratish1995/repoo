@@ -1,0 +1,59 @@
+advanced select:
+
+1: select
+CASE
+    when a=b and b=c then "Equilateral"
+    when (a+b)<c or a+b=c THEN "Not A Triangle" 
+    when (a=b and a<>c) oR (b=c and a<>c) OR (a=c and b<>c) THEN "Isosceles"
+    when a<>b AND b<>c AND c<>a THEN "Scalene"
+end
+from triangles;
+
+2:select name+"("+left(occupation,1)+")"
+from occupations
+order by name
+
+select "There are a total of"+Str(count(name))+" "+lower(occupation)+"s."
+from occupations 
+group by occupation
+order by count(name),occupation
+
+3:SELECT
+    [Doctor],
+    [Professor],
+    [Singer],
+    [Actor]
+FROM
+    (SELECT 
+         ROW_NUMBER() OVER (PARTITION BY Occupation ORDER BY Name) rn,
+         [Name],
+         [Occupation] 
+     FROM 
+         Occupations
+    ) AS source 
+PIVOT
+    ( MAX([Name]) FOR [occupation] IN ([Doctor],[Professor],[Singer],[Actor]) ) as pvt
+ORDER BY rn
+
+4:SELECT CASE
+	WHEN P IS NULL THEN CONCAT(N, ' Root')
+	WHEN N IN (SELECT DISTINCT P FROM BST) THEN CONCAT(N, ' Inner')
+	ELSE CONCAT(N, ' Leaf')
+	END
+FROM BST
+ORDER BY N ASC
+
+5:select c.company_code, c.founder, count(distinct lm.lead_manager_code), 
+count(distinct sm.senior_manager_code), count(distinct m.manager_code), 
+count(distinct e.employee_code)
+
+
+from Company c, Lead_Manager lm, Senior_Manager sm, Manager m, Employee e
+where c.company_code = lm.company_code
+	and lm.lead_manager_code = sm.lead_manager_code
+	and sm.senior_manager_code = m.senior_manager_code
+	and m.manager_code = e.manager_code
+group by c.company_code, c.founder
+order by c.company_code
+
+

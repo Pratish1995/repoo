@@ -1,0 +1,70 @@
+Basic select queries:
+
+1:select * from city
+where countrycode like 'USA' and population>100000;
+
+2: select name from city
+where countrycode like 'USA' and population>120000;
+
+3:select * from city;
+
+4:select * from city
+where id=1661;
+
+5:select * from city
+where countrycode like 'JPN';
+
+6:select name from city
+where countrycode like 'JPN';
+
+7:select city,state
+from station;
+
+8:select DISTINCT city 
+from station
+where id%2=0;
+
+9:select (count(city)- count(distinct city)) as b
+from station;
+
+10:select top 1 city,len(city)
+from station
+where len(city)=(select min(len(city))
+        from station)
+                   order by city;
+(select top 1 city,len(city)
+from station
+where len(city)=(select max(len(city))
+        from station
+                   ))
+             
+11:select distinct city from station
+where city like '[a,e,i,o,u]%'
+
+12:select distinct city from station
+where city like '%[a,e,i,o,u]'
+
+13:select distinct city from station
+where city like '%[a,e,i,o,u]' and city like '[a,e,i,o,u]%'
+
+14:select distinct city from station
+where city not like '[a,e,i,o,u]%'
+
+15:select distinct city from station
+where city not like '%[a,e,i,o,u]'
+
+16:select distinct city from station
+where city not like '%[a,e,i,o,u]' or city not like '[a,e,i,o,u]%'
+
+17:select distinct city from station
+where city not like '%[a,e,i,o,u]' and city not like '[a,e,i,o,u]%'
+
+18:select name from students
+where marks>75
+order by right(name,3),id
+
+19:select name from employee
+order by name;
+
+20:select name from employee
+where salary>2000 and months<10
